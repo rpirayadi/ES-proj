@@ -1,0 +1,20 @@
+int resval = 0;
+int respin = A0;
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  resval = analogRead(respin);
+
+  if(resval <= 100){
+    Serial.println("water level: empty");
+  }
+  else{
+    Serial.println("water level: full");
+  }
+  delay(1000);
+}
