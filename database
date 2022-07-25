@@ -1,0 +1,64 @@
+import psycopg2
+
+try:
+    connection = psycopg2.connect(user="sysadmin",
+                                  password="pynative@#29",
+                                  host="127.0.0.1",
+                                  port="5432",
+                                  database="postgres_db")
+    cursor = connection.cursor()
+
+    postgres_insert_query = """ INSERT INTO mobile (ID, MODEL, PRICE) VALUES (%s,%s,%s)"""
+    record_to_insert = (5, 'One Plus 6', 950)
+    cursor.execute(postgres_insert_query, record_to_insert)
+
+    connection.commit()
+    count = cursor.rowcount
+    print(count, "Record inserted successfully into mobile table")
+
+except (Exception, psycopg2.Error) as error:
+    print("Failed to insert record into mobile table", error)
+
+finally:
+    # closing database connection.
+    if connection:
+        cursor.close()
+        connection.close()
+        print("PostgreSQL connection is closed")
+        
+        
+        
+#!/usr/bin/python
+
+import psycopg2
+from config import config
+
+
+def insert_vendor(vendor_name):
+    """ insert a new vendor into the vendors table """
+    sql = """INSERT INTO vendors(vendor_name)
+             VALUES(%s) RETURNING vendor_id;"""
+    conn = None
+    vendor_id = None
+    try:
+        # read database configuration
+        params = config()
+        # connect to the PostgreSQL database
+        conn = psycopg2.connect(**params)
+        # create a new cursor
+        cur = conn.cursor()
+        # execute the INSERT statement
+        cur.execute(sql, (vendor_name,))
+        # get the generated id back
+        vendor_id = cur.fetchone()[0]
+        # commit the changes to the database
+        conn.commit()
+        # close communication with the database
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+    return vendor_id
